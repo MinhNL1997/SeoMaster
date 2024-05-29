@@ -27,7 +27,7 @@
           return;
         }
         var text = event.target.textContent || event.target.innerText;
-        xpath = '/html/' +  getXPath(event.target);
+        xpath = getXPath(event.target);
         if (text) {
           textarea.value = '';
           textarea.value += text;
