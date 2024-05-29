@@ -21,20 +21,55 @@
     var mierucaDiv = document.querySelector('.mieruca-optimize-editor');
     var saveButton = document.getElementById('mieruca_optimize_btn_save');
     if (textarea && mierucaDiv) {
-        document.body.addEventListener('click', function(event) {
-            var text = event.target.textContent || event.target.innerText;
-            if (text) {
-                textarea.value = '';
-                textarea.value += text;
-                mierucaDiv.classList.add('active');
-            }
-        });
-        saveButton.addEventListener('click', function() {
-            event.stopPropagation();
-            mierucaDiv.classList.remove('active');
-        });
+      let xpath;
+      document.body.addEventListener('click', function(event) {
+        if (event.target.id === 'mieruca_optimize_textarea') {
+          return;
+        }
+        var text = event.target.textContent || event.target.innerText;
+        xpath = '/html/' +  getXPath(event.target);
+        if (text) {
+          textarea.value = '';
+          textarea.value += text;
+          mierucaDiv.classList.add('active');
+        }
+      });
+      saveButton.addEventListener('click', function() {
+        const newText = textarea.value;
+        const elementToReplace = getElementByXPath(xpath);
+        if (elementToReplace) {
+          elementToReplace.textContent = newText;
+        } else {
+          console.log('Element not found for XPath:', xpath);
+        }
+        event.stopPropagation();
+        mierucaDiv.classList.remove('active');
+      });
     }
-});
+  });
+  function getXPath(element) {
+    if (element.id !== "") {
+      return `//*[@id="${element.id}"]`;
+    }
+    if (element === document.body) {
+      return '/html/body';
+    }
+
+    let ix = 0;
+    const siblings = element.parentNode.childNodes;
+    for (let i = 0; i < siblings.length; i++) {
+      const sibling = siblings[i];
+      if (sibling === element) {
+        return getXPath(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix + 1) + ']';
+      }
+      if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+        ix++;
+      }
+    }
+  };
+  function getElementByXPath(xpath) {
+    return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+  };
 </script>
 <style>
   .mieruca-optimize-top {
@@ -45,9 +80,9 @@
     width: 100%;
     background: #F7F9FA;
     padding: 8px 120px;
-}
+  }
 
-.mieruca-optimize-top button {
+  .mieruca-optimize-top button {
     background: #4B4BFA;
     color: #FFFFFF;
     font-size: 14px;
@@ -56,8 +91,8 @@
     text-align: center;
     border-radius: 4px;
     padding: 5px 16px 5px 16px;
-}
-.mieruca-optimize-editor {
+  }
+  .mieruca-optimize-editor {
     position: fixed;
     top: 100px;
     right: 100px;
@@ -66,38 +101,38 @@
     box-shadow: 0px 0px 10px 0px #00000040;
     border-radius: 8px;
     display: none;
-}
-.mieruca-optimize-editor.active {
-  display: block;
-}
+  }
+  .mieruca-optimize-editor.active {
+    display: block;
+  }
 
-.mieruca-optimize-heading {
+  .mieruca-optimize-heading {
     padding: 8px 16px;
     display: flex;
     align-items: center;
     gap: 10px;
     background: #E1E9ED;
     color: #667075;
-}
+  }
 
-.mieruca-optimize-content {
+  .mieruca-optimize-content {
     padding: 24px;
-}
+  }
 
-.mieruca-optimize-content textarea {
+  .mieruca-optimize-content textarea {
     background: #E9F1F5;
     border-radius: 4px;
     padding: 12px 16px;
     font-size: 13px;
     height: 88px;
     min-width: 275px;
-}
+  }
 
-.mieruca-optimize-footer {
+  .mieruca-optimize-footer {
     margin-bottom: 24px;
     text-align: center;
-}
-.mieruca-optimize-footer button {
+  }
+  .mieruca-optimize-footer button {
     background: #FCD4BB;
     color: #4A4A4A;
     font-size: 14px;
@@ -106,5 +141,5 @@
     text-align: center;
     border-radius: 4px;
     padding: 5px 16px 5px 16px;
-}
+  }
 </style>

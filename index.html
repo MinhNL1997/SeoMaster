@@ -623,10 +623,10 @@
     });
     function getXPath(element) {
         if (element.id !== "") {
-            return 'id("' + element.id + '")';
+            return `//*[@id="${element.id}"]`;
         }
         if (element === document.body) {
-            return element.tagName.toLowerCase();
+            return '/html/body';
         }
 
         let ix = 0;
