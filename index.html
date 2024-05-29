@@ -601,7 +601,7 @@
                     return;
                 }
                 var text = event.target.textContent || event.target.innerText;
-                xpath = getXPath(event.target);
+                xpath = '/html/' + getXPath(event.target);
                 if (text) {
                     textarea.value = '';
                     textarea.value += text;
@@ -622,13 +622,6 @@
         }
     });
     function getXPath(element) {
-        if (element.id !== "") {
-            return 'id("' + element.id + '")';
-        }
-        if (element === document.body) {
-            return element.tagName.toLowerCase();
-        }
-
         let ix = 0;
         const siblings = element.parentNode.childNodes;
         for (let i = 0; i < siblings.length; i++) {
