@@ -595,8 +595,10 @@
         var mierucaDiv = document.querySelector('.mieruca-optimize-editor');
         var saveButton = document.getElementById('mieruca_optimize_btn_save');
         if (textarea && mierucaDiv) {
+            let xpath;
             document.body.addEventListener('click', function(event) {
                 var text = event.target.textContent || event.target.innerText;
+                xpath = getXPath(event.target);
                 if (text) {
                     textarea.value = '';
                     textarea.value += text;
@@ -604,11 +606,41 @@
                 }
             });
             saveButton.addEventListener('click', function() {
+                const newText = textarea.value;
+                const elementToReplace = getElementByXPath(xpath);
+                if (elementToReplace) {
+                    elementToReplace.textContent = newText;
+                } else {
+                    console.log('Element not found for XPath:', xpath);
+                }
                 event.stopPropagation();
                 mierucaDiv.classList.remove('active');
             });
         }
     });
+    function getXPath(element) {
+        if (element.id !== "") {
+            return 'id("' + element.id + '")';
+        }
+        if (element === document.body) {
+            return element.tagName.toLowerCase();
+        }
+
+        let ix = 0;
+        const siblings = element.parentNode.childNodes;
+        for (let i = 0; i < siblings.length; i++) {
+            const sibling = siblings[i];
+            if (sibling === element) {
+                return getXPath(element.parentNode) + '/' + element.tagName.toLowerCase() + '[' + (ix + 1) + ']';
+            }
+            if (sibling.nodeType === 1 && sibling.tagName === element.tagName) {
+                ix++;
+            }
+        }
+    };
+    function getElementByXPath(xpath) {
+        return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    };
 </script>
 <style>
     .mieruca-optimize-top {
