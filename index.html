@@ -574,7 +574,7 @@
     <!--Bùa Chú-->
 <div id="mieruca_optimize">
     <div class="mieruca-optimize-top">
-        <button>Save</button>
+        <button onclick="saveVisualEditor()">Save</button>
     </div>
     <div class="mieruca-optimize-editor-text mieruca-optimize-editor">
         <div class="mieruca-optimize-heading">
@@ -590,6 +590,7 @@
     </div>
 </div>
 <script>
+    let visualEditorDataChange = [];
     document.addEventListener("DOMContentLoaded", function() {
         var textarea = document.getElementById('mieruca_optimize_textarea');
         var mierucaDiv = document.querySelector('.mieruca-optimize-editor');
@@ -611,11 +612,28 @@
             saveButton.addEventListener('click', function() {
                 const newText = textarea.value;
                 const elementToReplace = getElementByXPath(xpath);
+                const originalHTML = elementToReplace.outerHTML;
                 if (elementToReplace) {
                     elementToReplace.textContent = newText;
                 } else {
                     console.log('Element not found for XPath:', xpath);
                 }
+                const newHTMl = elementToReplace.outerHTML;
+                const veData = {
+                    index: visualEditorDataChange.size + 1,
+                    xpath: xpath,
+                    type: 'TEXT',
+                    originalHTML: originalHTML,
+                    newHTMl: newHTMl,
+                    attributes: [],
+                    properties: [],
+                    innerHtml: elementToReplace.innerHTML,
+                    newXpath: null,
+                    insertAction: null,
+                    css: null,
+                    javaScript: null
+                };
+                visualEditorDataChange.push(veData);
                 event.stopPropagation();
                 mierucaDiv.classList.remove('active');
             });
@@ -643,6 +661,27 @@
     };
     function getElementByXPath(xpath) {
         return document.evaluate(xpath, document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+    };
+    function saveVisualEditor() {
+        let messageObject = {
+            action: 'SAVE_DATA_SETTING',
+            data: buildVEDataChange()
+        };
+        let parent = window.opener;
+        parent.postMessage(messageObject, document.referrer);
+    };
+    function buildVEDataChange() {
+        return data = {
+            id: 999,
+            name: 'patternTest',
+            editors: [
+                {
+                    device: 'DESKTOP',
+                    stacks: visualEditorDataChange,
+                    script: null
+                }
+            ]
+        };
     };
 </script>
 <style>
