@@ -597,6 +597,9 @@
         if (textarea && mierucaDiv) {
             let xpath;
             document.body.addEventListener('click', function(event) {
+                if (event.target.id === 'mieruca_optimize_textarea') {
+                    return;
+                }
                 var text = event.target.textContent || event.target.innerText;
                 xpath = getXPath(event.target);
                 if (text) {
